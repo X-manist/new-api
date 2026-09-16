@@ -26,3 +26,28 @@ func TestWanEndpointsDistinguishImagesFromVideos(t *testing.T) {
 		})
 	}
 }
+
+func TestIsImageGenerationModel(t *testing.T) {
+	tests := []struct {
+		name  string
+		model string
+		want  bool
+	}{
+		{name: "gpt-image-1", model: "gpt-image-1", want: true},
+		{name: "gpt-image-1.5", model: "gpt-image-1.5", want: true},
+		{name: "gpt-image versioned suffix", model: "gpt-image-2.5-sunburst", want: true},
+		{name: "chatgpt-image-latest", model: "chatgpt-image-latest", want: true},
+		{name: "dall-e", model: "dall-e-3", want: true},
+		{name: "imagen prefix", model: "imagen-4.0-generate-001", want: true},
+		{name: "flux", model: "flux.1-schnell", want: true},
+		{name: "chat model", model: "gpt-4o", want: false},
+		{name: "text model", model: "gpt-5.2", want: false},
+		{name: "gemini model", model: "gemini-2.5-flash-image", want: false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, common.IsImageGenerationModel(test.model))
+		})
+	}
+}

@@ -161,6 +161,18 @@ func TestMultiprotocolGatewayEndpointTypes(t *testing.T) {
 	assert.Equal(t, want, common.GetEndpointTypesByChannelType(constant.ChannelTypeSub2API, "gpt-5"))
 }
 
+func TestAutoChannelTestUsesImageEndpointForImageModels(t *testing.T) {
+	channel := &model.Channel{Type: constant.ChannelTypeOpenAI}
+
+	imageModelRequest := buildTestRequest("gpt-image-2.5-sunburst", "", channel, false)
+	imageRequest, ok := imageModelRequest.(*dto.ImageRequest)
+	require.True(t, ok, "auto test of an image model must build an image request, got %T", imageModelRequest)
+	assert.Equal(t, "gpt-image-2.5-sunburst", imageRequest.Model)
+
+	chatModelRequest := buildTestRequest("gpt-5.2", "", channel, false)
+	assert.IsType(t, &dto.GeneralOpenAIRequest{}, chatModelRequest)
+}
+
 func TestCopyChannelRejectsInvalidLegacyProxySettings(t *testing.T) {
 	db := setupModelListControllerTestDB(t)
 	settingBytes, err := common.Marshal(dto.ChannelSettings{
